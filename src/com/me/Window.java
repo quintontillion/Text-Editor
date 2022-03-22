@@ -12,10 +12,13 @@ import java.io.*;
 import java.util.Scanner;
 
 public class Window {
+    public void Close() {
+        Window.this.jf.dispose();
+    }
     public void Save() {
         //gets the text in the text area
         String Stext = Window.this.text.getText();
-        if (!(Stext==null)) {
+        if (!(Stext.equals(null))) {
             FileDialog chooser = new FileDialog((Frame) null,"Save file");
             chooser.setDirectory(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
             chooser.setMode(FileDialog.SAVE);
@@ -50,18 +53,24 @@ public class Window {
         Save();
         jf.dispose();
     }
-    JFrame jf;
+    String Loc="";
+    public static JFrame jf;
+    public static String Font="";
     public JFrame returnJFrame() {
         return jf;
     }
     String defaultloc="";
     public JTextArea text= new JTextArea();
     /**
-     * this just creates the window
+     * class that creates the window
      */
     public Window(String loc, String name) {
+        //Makes sure all the files are there
+        new CheckFiles();
+        text.setFont(java.awt.Font.decode(Font));
+        System.out.println(Font);
         //Creates the window
-        jf = new JFrame(name);
+        jf= new JFrame(name);
         //Sets Size
         jf.setSize(1000,1000);
         //Sets default close operation because I normally forget
@@ -78,6 +87,7 @@ public class Window {
         if (!(loc==null)) {
             //this is to make it load a file on default
             File location = new File(loc);
+            Loc =loc;
             try {
                 //reads file
                 Scanner read = new Scanner(location);
@@ -96,14 +106,24 @@ public class Window {
         //adds the menu bar
         JMenuBar menubar = new JMenuBar();
         JMenu menu = new JMenu("File");
+        //this menu is for the fonts and changing other aspects
+        JMenu other = new JMenu("Other");
         //item1 is for opening
         JMenuItem item1 = new JMenuItem("Open");
         item1.addActionListener(new Item1Listener());
         JMenuItem item2 = new JMenuItem("Save");
         item2.addActionListener(new Item2Listener());
+        JMenuItem newWin = new JMenuItem("New Window");
+        newWin.addActionListener(new NewWindowListener());
         menu.add(item1);
         menu.add(item2);
+        menu.add(newWin);
+        //Font menu item
+        JMenuItem font = new JMenuItem("Font");
+        font.addActionListener(new FontListener());
+        other.add(font);
         menubar.add(menu);
+        menubar.add(other);
         jf.setJMenuBar(menubar);
         //Sets visible
         jf.setVisible(true);
@@ -140,6 +160,20 @@ public class Window {
         @Override
         public void actionPerformed(ActionEvent e) {
            Save();
+        }
+    }
+    //class for listener of the new window jmenu button
+    public class NewWindowListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new Window(null, "Text Editor");
+        }
+    }
+    //class listener for the font menu item
+    public class FontListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new FontWindow();
         }
     }
     public static void main(String args[]) {
